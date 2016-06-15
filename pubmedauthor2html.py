@@ -33,6 +33,7 @@ def get_data_for_id(id, params):
 def text_output(xml):
     """Makes a simple text output from the XML returned from efetch"""
     xmldoc = minidom.parseString(xml)
+    #print(xmldoc.toprettyxml())
     title = xmldoc.getElementsByTagName('ArticleTitle')[0]
     title = title.childNodes[0].data
     abstract = xmldoc.getElementsByTagName('AbstractText')[0]
@@ -42,8 +43,16 @@ def text_output(xml):
     authorlist = []
     for author in authors:
         LastName = author.getElementsByTagName('LastName')[0].childNodes[0].data
-        Initials = author.getElementsByTagName('Initials')[0].childNodes[0].data
-        author = '%s, %s' % (LastName, Initials)
+        ForeName = author.getElementsByTagName('ForeName')[0].childNodes[0].data
+        if (LastName == "Huska"):
+            author = '<strong>%s %s</strong>' % (ForeName, LastName)
+        else:
+            author = '%s %s' % (ForeName, LastName)
+        #Initials = author.getElementsByTagName('Initials')[0].childNodes[0].data
+        #if (LastName == "Huska"):
+        #    author = '<strong>%s %s</strong>' % (LastName, Initials)
+        #else:
+        #    author = '%s %s' % (LastName, Initials)
         authorlist.append(author)
     journalinfo = xmldoc.getElementsByTagName('Journal')[0]
     journal = journalinfo.getElementsByTagName('Title')[0].childNodes[0].data
@@ -58,24 +67,27 @@ def text_output(xml):
     pmid=""
     doi=""
     for id in ids:
-        #print id.toxml()
         attr = id.getAttribute("IdType")
         if attr == 'doi':
             doi = id.firstChild.data
         elif attr == "pubmed":
-            pubmed = id.firstChild.data
-
-    #doi = xmldoc.getElementsByTagName('doi')[0].childNodes[0].data
-    #pmid = xmldoc.getElementsByTagName('pubmed')[0].childNodes[0].data
+            pmid = id.firstChild.data
 
     output = []
+    output.append('<p>')
     output.append(', '.join(authorlist))
+    output.append('. ')
     output.append(title)
     #output.append( '%s %s, %s (%s):%s' % (journal, year, volume, issue, pages) )
+    output.append(' ')
     output.append( '%s %s' % (journal, year) )
     # details: http://www.ncbi.nlm.nih.gov/books/NBK3862/
     # example: http://www.ncbi.nlm.nih.gov/pubmed/18276894
-    output.append( 'PMID: <a href="http://www.ncbi.nlm.nih.gov/pubmed/%s">%s</a> doi:%s' % (pmid, pmid, doi) )
+    output.append('. ')
+    output.append('PMID: <a href="http://www.ncbi.nlm.nih.gov/pubmed/%s">%s</a>' % (pmid, pmid))
+    output.append(' ')
+    output.append('doi: <a href="http://dx.doi.org/%s">%s</a>' % (doi, doi) )
+    output.append('</p>')
 
     #output.append(title)
     #output.append('') #empty line
@@ -108,6 +120,6 @@ if __name__ == '__main__':
     for iddom in ids:
         id = iddom.childNodes[0].data
         data = get_data_for_id(id, params)
-        print '. '.join(text_output(data))
+        print ''.join(text_output(data))
 
 
