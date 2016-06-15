@@ -80,7 +80,7 @@ def text_output(xml):
     output.append(title)
     #output.append( '%s %s, %s (%s):%s' % (journal, year, volume, issue, pages) )
     output.append(' ')
-    output.append( '%s %s' % (journal, year) )
+    output.append( '<i>%s</i> %s' % (journal, year) )
     # details: http://www.ncbi.nlm.nih.gov/books/NBK3862/
     # example: http://www.ncbi.nlm.nih.gov/pubmed/18276894
     output.append('. ')
